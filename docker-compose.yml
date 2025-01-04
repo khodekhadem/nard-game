@@ -58,8 +58,8 @@ services:
     command: tail -f
     volumes:
       - ./:/p
-    ports:
-      - 2223:2223
+    #ports:
+    #  - 2223:2223
     networks:
       my_network:
         #ipv4_address: 192.168.10.20

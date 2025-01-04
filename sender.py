@@ -23,30 +23,34 @@ def encrypt(message, AES_KEY):
     return encoded.decode('utf-8')
 
 # Load public keys
-keys = []
-for i in range(1, 4):
-    with open(f"AES{i}", "rb") as key_file:
-        tmp = key_file.read()
-        print(f"tmp: {tmp}")
-        keys.append(tmp)  # Append tmp directly since it's already bytes
+def start(mymessage):
+    message = mymessage #"Hello, this is a test message."
+    keys = []
+    for i in range(1, 4):
+        with open(f"AES{i}", "rb") as key_file:
+            tmp = key_file.read()
+            print(f"tmp: {tmp}")
+            keys.append(tmp)  # Append tmp directly since it's already bytes
 
-# Encrypt the message with all public keys
-message = "Hello, this is a test message."
-encrypted_message = message
+    # Encrypt the message with all public keys
+    encrypted_message = message
 
-for key in keys:
-    print('log------------------------')
-    encrypted_message = encrypt(encrypted_message, key)
-    print(f"Encrypted: {encrypted_message}")
-    
+    for key in keys:
+        print('log------------------------')
+        encrypted_message = encrypt(encrypted_message, key)
+        print(f"Encrypted: {encrypted_message}")
 
-# Create a socket and connect to the router
-client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client_socket.connect(( 'router1', 2001))
 
-# Send the encrypted messages
-client_socket.sendall(str.encode(encrypted_message))
+    # Create a socket and connect to the router
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client_socket.connect(( 'router1', 2001))
 
-client_socket.close()
+    # Send the encrypted messages
+    client_socket.sendall(str.encode(encrypted_message))
 
-print("Encrypted messages sent to the router.")
+    client_socket.close()
+
+    print("Encrypted messages sent to the router.")
+
+start('heykhoda')
+

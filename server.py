@@ -31,7 +31,7 @@ def recive_message(myserver,b ):
 
 clientlist = []
 server =socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-server.bind(('0.0.0.0',2223))
+server.bind(('0.0.0.0',2001))
 server.listen(10)
 print(f'server is listenning on ')
 my2thread = threading.Thread(target=clear_online_clients)

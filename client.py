@@ -4,13 +4,16 @@ import threading
 from multiprocessing import Process
 import time
 import sys
+import sender
 
 voroodi_available = True
 loop_available=True
 
 server =socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 #server.connect(('127.0.0.1',2223))
-server.connect(('server',2223))
+
+
+#server.connect(('server',2223))
 
 game_server_bind=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 game_server_bind.bind(('0.0.0.0',8888))
@@ -52,8 +55,9 @@ def game_server_bind_accept():
 
 
 def send_message(msg,myserver):
-    
-    myserver.send(f'{msg}'.encode())
+    #myserver.send(f'{msg}'.encode())
+    sender.start(msg)
+
     #print('sent')
 def send_loop_message(msg,delay=0):
     while loop_available:
@@ -97,7 +101,7 @@ def vorodi():
             print(server.recv(1024).decode())
         elif inp=='2':
             loop_available= True
-            send_online=threading.Thread(target=send_loop_message,args=(f'im_online {sys.argv[1]}',1))
+            send_online=threading.Thread(target=send_loop_message,args=(f'im_online {sys.argv[1]}',4))
             send_online.start()
         elif inp=='3':
             #send_online.terminate()

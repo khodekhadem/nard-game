@@ -54,13 +54,13 @@ while True:
 
     # Send the decrypted message to another server
     print(decrypted_message)
-    if AES_NUM == '1':
-        print(decrypted_message)
-        break
+    #if AES_NUM == '1':
+    #    print(decrypted_message)
+    #    break
 
     target_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     target_server_address = os.getenv('TARGET_SERVER_ADDRESS')
-    print(f'target server address: {target_server_address}')
+    print(f'target server address:{target_server_address}')
     target_socket.connect((target_server_address, 2001))
     print(decrypted_message)
     target_socket.sendall(str.encode(decrypted_message))
