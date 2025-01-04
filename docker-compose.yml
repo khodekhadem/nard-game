@@ -36,7 +36,7 @@ services:
     #command: -f
     environment: 
       - AES_NUM=1
-      - TARGET_SERVER_ADDRESS=router3
+      - TARGET_SERVER_ADDRESS=server
     volumes:
       - ./:/app
     networks:
