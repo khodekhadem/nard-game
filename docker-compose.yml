@@ -1,5 +1,37 @@
-
 services:
+  router1:
+    build: .
+    image: router_image
+    environment:
+      - TARGET_SERVER_ADDRESS=router2
+    volumes:
+      - ./:/app
+    #ports:
+    #  - 2001:2001
+    networks:
+      my_network:
+        #ipv4_address:
+
+  router2:
+    build: .
+    image: router_image
+    environment: 
+      - TARGET_SERVER_ADDRESS=router3
+    volumes:
+      - ./:/app
+    networks:
+      my_network:
+        #ipv4_address:
+
+  router3:
+    build: .
+    image: router_image
+    volumes:
+      - ./:/app
+    networks:
+      my_network:
+        #ipv4_address:
+
   server:
     image: python
     command: tail -f
@@ -10,6 +42,7 @@ services:
     networks:
       my_network:
         #ipv4_address: 192.168.10.20
+
   app1:
     image: python
     command: tail -f
