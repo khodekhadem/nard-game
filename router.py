@@ -1,13 +1,37 @@
 import socket
 import ssl
 import base64
-from Crypto.PublicKey import RSA
-from Crypto.Cipher import PKCS1_OAEP
+from Crypto.PublicKey import RSA 
+from Crypto.Cipher import PKCS1_OAEP, AES
 import os
+# Fixed AES key (must be 16, 24, or 32 bytes long)
+#AES_KEY = b'This is a key123'
+
+# Padding for the input string --not related to encryption itself.
+BLOCK_SIZE = 16
+PADDING = '{'
+
+# Function to pad the input string
+def pad(s):
+    return s + (BLOCK_SIZE - len(s) % BLOCK_SIZE) * PADDING
+
+# Function to decrypt a message
+def decrypt(encrypted_message,AES_KEY):
+    cipher = AES.new(AES_KEY, AES.MODE_ECB)
+    decoded = cipher.decrypt(base64.b64decode(encrypted_message)).decode('utf-8')
+    return decoded.rstrip(PADDING)
 
 # Load private key
-with open("private_key_1.pem", "rb") as key_file:
-    private_key = RSA.import_key(key_file.read())
+#get AES_NUM from environment variable
+AES_NUM = os.getenv('AES_NUM')
+print(f"AES_NUM: {AES_NUM}")
+with open(f"AES{AES_NUM}", "rb") as key_file:
+    key = key_file.read()
+    print(f"key: {key}")
+
+
+
+
 
 # Create a socket and listen on port 2001
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -25,17 +49,21 @@ while True:
     client_socket.close()
 
     # Decrypt the message
-    cipher_rsa = PKCS1_OAEP.new(private_key)
-    decrypted_message = cipher_rsa.decrypt(base64.b64decode(encrypted_message))
+    print(encrypted_message)
+    decrypted_message = decrypt(encrypted_message,key)
 
     # Send the decrypted message to another server
     print(decrypted_message)
+    if AES_NUM == '1':
+        print(decrypted_message)
+        break
+
     target_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     target_server_address = os.getenv('TARGET_SERVER_ADDRESS')
-    target_server_address = 'router2'
     print(f'target server address: {target_server_address}')
     target_socket.connect((target_server_address, 2001))
-    target_socket.sendall(decrypted_message)
+    print(decrypted_message)
+    target_socket.sendall(str.encode(decrypted_message))
     target_socket.close()
 
     print("Message forwarded to the target server.")

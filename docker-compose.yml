@@ -2,7 +2,10 @@ services:
   router1:
     build: .
     image: router_image
+    #entrypoint: tail
+    #command: -f
     environment:
+      - AES_NUM=3
       - TARGET_SERVER_ADDRESS=router2
     volumes:
       - ./:/app
@@ -15,7 +18,10 @@ services:
   router2:
     build: .
     image: router_image
+    #entrypoint: tail
+    #command: -f
     environment: 
+      - AES_NUM=2
       - TARGET_SERVER_ADDRESS=router3
     volumes:
       - ./:/app
@@ -26,8 +32,23 @@ services:
   router3:
     build: .
     image: router_image
+    #entrypoint: tail
+    #command: -f
+    environment: 
+      - AES_NUM=1
+      - TARGET_SERVER_ADDRESS=router3
     volumes:
       - ./:/app
+    networks:
+      my_network:
+        #ipv4_address:
+  sender:
+    build: .
+    image: router_image
+    volumes:
+      - ./:/app
+    entrypoint: tail
+    command: -f
     networks:
       my_network:
         #ipv4_address:
