@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chat Room</title>
+  <style>
+    body { font-family: Arial; }
+    #chat { width: 300px; height: 300px; border: 1px solid #ccc; overflow-y: scroll; }
+    #message { width: 200px; }
+  </style>
+</head>
+<body>
+  <div id="chat"></div>
+  <br/>
+  <input id="message" type="text" placeholder="Type a message..."/>
+  <button onclick="sendMessage()">Send</button>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const messageBox = document.getElementById('message');
+      messageBox.addEventListener('keyup', (e) => {
+        if (e.key === 'Enter') {
+          sendMessage();
+        }
+      });
+    });
+
+    async function getMessages() {
+      let chat = document.getElementById('chat');
+      const response = await fetch('/get_messages');
+      const data = await response.json();
+      chat.innerHTML = '';
+      data.messages.forEach(m => {
+        let div = document.createElement('div');
+        div.textContent = m;
+        chat.appendChild(div);
+      });
+    }
+    
+    async function sendMessage() {
+      let messageBox = document.getElementById('message');
+      if (!messageBox.value) return;
+
+      let formData = new FormData();
+      formData.append('message', messageBox.value);
+
+      await fetch('/send_message', {
+        method: 'POST',
+        body: formData
+      });
+      messageBox.value = '';
+      getMessages();
+    }
+
+    // Refresh chat every 2 seconds
+    setInterval(getMessages, 2000);
+  </script>
+</body>
+</html>
