@@ -1,5 +1,6 @@
 import socket
 import ssl
+import threading
 import base64
 from Crypto.PublicKey import RSA 
 from Crypto.Cipher import PKCS1_OAEP, AES
@@ -38,32 +39,54 @@ server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server_socket.bind(('0.0.0.0', 2001))
 server_socket.listen(5)
 
-print("Listening on port 2001...")
 
+def baraks(client_socket, target_socket):
+    while True:
+        back_message = target_socket.recv(4096)
+        print(back_message)
+        print(type(back_message))
+        decrypted_message = decrypt(back_message,key)
+        print(decrypted_message)
+        print(type(decrypted_message))
+        client_socket.sendall(str.encode(decrypted_message))
+        print('baraks')
+#mythread = threading.Thread(target=baraks)
+#mythread.start()
+
+def mostaghim (client_socket, target_socket):
+    while True:
+
+        # Receive the encrypted message
+        encrypted_message = client_socket.recv(4096)
+        #client_socket.close()
+
+        # Decrypt the message
+        print(encrypted_message)
+        decrypted_message = decrypt(encrypted_message,key)
+
+        # Send the decrypted message to another server
+        print(decrypted_message)
+        #if AES_NUM == '1':
+        #    print(decrypted_message)
+        #    break
+
+        print(decrypted_message)
+        target_socket.sendall(str.encode(decrypted_message))
+        #target_socket.close()
+
+        print("Message forwarded to the target server.")
 while True:
+    print("Listening on port 2001...")
+
     client_socket, addr = server_socket.accept()
     print(f"Connection from {addr}")
-
-    # Receive the encrypted message
-    encrypted_message = client_socket.recv(4096)
-    client_socket.close()
-
-    # Decrypt the message
-    print(encrypted_message)
-    decrypted_message = decrypt(encrypted_message,key)
-
-    # Send the decrypted message to another server
-    print(decrypted_message)
-    #if AES_NUM == '1':
-    #    print(decrypted_message)
-    #    break
 
     target_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     target_server_address = os.getenv('TARGET_SERVER_ADDRESS')
     print(f'target server address:{target_server_address}')
     target_socket.connect((target_server_address, 2001))
-    print(decrypted_message)
-    target_socket.sendall(str.encode(decrypted_message))
-    target_socket.close()
-
-    print("Message forwarded to the target server.")
+    #threading.Thread(target=mostaghim).start()
+    mythread = threading.Thread(target=mostaghim, args=(client_socket, target_socket))
+    mythread.start()
+    mysthread = threading.Thread(target=baraks, args=(client_socket, target_socket))
+    mysthread.start()

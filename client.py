@@ -56,7 +56,7 @@ def game_server_bind_accept():
 
 def send_message(msg,myserver):
     #myserver.send(f'{msg}'.encode())
-    sender.start(msg)
+    sender.start(msg,myserver,'router1')
 
     #print('sent')
 def send_loop_message(msg,delay=0):
@@ -97,6 +97,8 @@ def vorodi():
         os.system('clear')
 
         if inp == '1':
+            os.system('clear')
+            print('im in one')
             send_message('get_list',server)
             print(server.recv(1024).decode())
         elif inp=='2':

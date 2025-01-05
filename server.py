@@ -2,10 +2,11 @@ import socket
 import threading
 import time
 import random
+import sender
 
 def clear_online_clients():
     while True:
-        time.sleep(5)
+        time.sleep(20)
         clientlist.clear()
 
 def recive_message(myserver,b ):
@@ -13,6 +14,7 @@ def recive_message(myserver,b ):
         msg = myserver.recv(1024).decode()
         if not msg:
             break
+        print(msg)
         command = msg.split()[0]
 
         if command == 'im_online':
@@ -22,10 +24,13 @@ def recive_message(myserver,b ):
                 clientlist.append(msg)
                 #print(f'-------------->{clientlist}')
         elif command == 'get_list':
+            print('thi is get_list&&&&&&&')
             print(clientlist)
-            myserver.send(f'{clientlist}'.encode())
+            #myserver.send(f'{clientlist}'.encode())
+            sender.start(f'{clientlist}',myserver,'router3',baraks=1)
         elif command == 'dice':
-            myserver.send(f'{random.randint(1,6)}'.encode())
+            #myserver.send(f'{random.randint(1,6)}'.encode())
+            sender.start(f'{random.randint(1,6)}',myserver,'router3',baraks=1)
 
 
 

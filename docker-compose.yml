@@ -1,28 +1,28 @@
 services:
   router1:
-    build: .
     image: router_image
     #entrypoint: tail
     #command: -f
     environment:
       - AES_NUM=3
       - TARGET_SERVER_ADDRESS=router2
+      - PYTHONUNBUFFERED=1
     volumes:
       - ./:/app
-    #ports:
-    #  - 2001:2001
+    ports:
+      - 2001:2001
     networks:
       my_network:
         #ipv4_address:
 
   router2:
-    build: .
     image: router_image
     #entrypoint: tail
     #command: -f
     environment: 
       - AES_NUM=2
       - TARGET_SERVER_ADDRESS=router3
+      - PYTHONUNBUFFERED=1
     volumes:
       - ./:/app
     networks:
@@ -30,20 +30,19 @@ services:
         #ipv4_address:
 
   router3:
-    build: .
     image: router_image
     #entrypoint: tail
     #command: -f
     environment: 
       - AES_NUM=1
       - TARGET_SERVER_ADDRESS=server
+      - PYTHONUNBUFFERED=1
     volumes:
       - ./:/app
     networks:
       my_network:
         #ipv4_address:
   sender:
-    build: .
     image: router_image
     volumes:
       - ./:/app
@@ -54,10 +53,12 @@ services:
         #ipv4_address:
 
   server:
-    image: python
-    command: tail -f
+    image: router_image
+    environment: 
+      - PYTHONUNBUFFERED=1
+    command: python server.py
     volumes:
-      - ./:/p
+      - ./:/app
     #ports:
     #  - 2223:2223
     networks:
@@ -65,19 +66,19 @@ services:
         #ipv4_address: 192.168.10.20
 
   app1:
-    image: python
+    image: router_image
     command: tail -f
     volumes:
-      - ./:/p
+      - ./:/app
     networks:
       my_network:
         #ipv4_address: 192.168.1.2
 
   app2:
-    image: python
+    image: router_image
     command: tail -f
     volumes:
-      - ./:/p
+      - ./:/app
     networks:
       my_network:
         #ipv4_address: 192.168.1.2
