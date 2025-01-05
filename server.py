@@ -18,8 +18,8 @@ def recive_message(myserver,b ):
         command = msg.split()[0]
 
         if command == 'im_online':
-            _ , name = msg.split()
-            msg =f'{name} {b[0]}' # name ip
+            _ , name , ip= msg.split()
+            msg =f'{name} {ip}' # name ip
             if msg not in clientlist:
                 clientlist.append(msg)
                 #print(f'-------------->{clientlist}')

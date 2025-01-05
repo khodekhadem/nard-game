@@ -103,7 +103,7 @@ def vorodi():
             print(server.recv(1024).decode())
         elif inp=='2':
             loop_available= True
-            send_online=threading.Thread(target=send_loop_message,args=(f'im_online {sys.argv[1]}',4))
+            send_online=threading.Thread(target=send_loop_message,args=(f'im_online {sys.argv[1]} {socket.gethostbyname(socket.gethostname())}',4))
             send_online.start()
         elif inp=='3':
             #send_online.terminate()
