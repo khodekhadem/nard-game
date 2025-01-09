@@ -70,6 +70,8 @@ services:
     command: tail -f
     volumes:
       - ./:/app
+    ports:
+      - 5000:5000
     networks:
       my_network:
         #ipv4_address: 192.168.1.2
@@ -97,7 +99,7 @@ services:
 networks:
   my_network:
     driver: bridge
-      #    ipam:
-      #      config:
-      #        - subnet: 192.168.1.0/24
+      #ipam:
+      #  config:
+      #    - subnet: 192.168.1.0/24
 

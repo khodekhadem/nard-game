@@ -12,7 +12,8 @@ def clear_online_clients():
 def recive_message(myserver,b ):
     while True:
         msg = myserver.recv(1024).decode()
-        if not msg:
+        if not msg or msg == b'' or msg == '':
+            a.close()
             break
         print(msg)
         command = msg.split()[0]
@@ -46,6 +47,7 @@ while True:
     a , b = server.accept()
 
     my1thread = threading.Thread(target=recive_message,args=(a,b))
+    
 
     my1thread.start()
     print(f'{b} ooommaaadd')

@@ -58,6 +58,9 @@ def mostaghim (client_socket, target_socket):
 
         # Receive the encrypted message
         encrypted_message = client_socket.recv(4096)
+        if encrypted_message == b'':
+            print('client disconnected')
+            break
         #client_socket.close()
 
         # Decrypt the message

@@ -5,6 +5,8 @@ from multiprocessing import Process
 import time
 import sys
 import sender
+import chat as webchat
+import multiprocessing
 
 voroodi_available = True
 loop_available=True
@@ -65,6 +67,8 @@ def send_loop_message(msg,delay=0):
         if delay>0:
             time.sleep(delay)
         send_message(msg,server)
+def star_webchat():
+    webchat.start()
 def game(ip):
     global voroodi_available
     global loop_available
@@ -75,14 +79,12 @@ def game(ip):
     game_server_connect =socket.socket(socket.AF_INET,socket.SOCK_STREAM)
     game_server_connect.connect((ip,8888))
     send_message('man omadam bazi',game_server_connect)
+    webchat_process = multiprocessing.Process(target=star_webchat)
+    webchat_process.start()
     chat_list=[]
     while True:
-        os.system('clear')
-        for msg in chat_list:
-            print(msg)
-        input_msg = input()
-        chat_list.append(f'{sys.argv[1]}: {input_msg}')
-        send_message(input_msg,game_server_connect)
+        time.sleep(1)
+        print('game wait' )
     
 
 def vorodi():
