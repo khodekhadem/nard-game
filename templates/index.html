@@ -57,14 +57,20 @@
     #backgammonBoard {
       width: 80%;
       max-width: 600px;
-      height: 400px;
+      height: 200px;
       border: 2px solid #333;
       margin-top: 20px;
       display: flex;
+      flex-direction: column;
       justify-content: space-around;
       align-items: center;
       background: #fff;
       color: #333;
+    }
+    .row {
+      display: flex;
+      justify-content: space-around;
+      width: 100%;
     }
     .point {
       width: 30px;
@@ -94,18 +100,8 @@
     <div id="diceResult"></div>
   </div>
   <div id="backgammonBoard">
-    <div class="point">1</div>
-    <div class="point">2</div>
-    <div class="point">3</div>
-    <div class="point">4</div>
-    <div class="point">5</div>
-    <div class="point">6</div>
-    <div class="point">7</div>
-    <div class="point">8</div>
-    <div class="point">9</div>
-    <div class="point">10</div>
-    <div class="point">11</div>
-    <div class="point">12</div>
+    <div class="row" id="row1"></div>
+    <div class="row" id="row2"></div>
   </div>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -115,6 +111,7 @@
           sendMessage();
         }
       });
+      getNumbers();
     });
 
     async function getMessages() {
@@ -151,15 +148,46 @@
       document.getElementById('diceResult').textContent = `Dice: ${data.dice[0]}, ${data.dice[1]}`;
     }
 
-    setInterval(getMessages, 2000);
+    async function getNumbers() {
+      const response = await fetch('/get_numbers');
+      const data = await response.json();
+      const row1 = document.getElementById('row1');
+      const row2 = document.getElementById('row2');
+      row1.innerHTML = '';
+      row2.innerHTML = '';
+      data.numbers[0].forEach((num, index) => {
+        let div = document.createElement('div');
+        div.classList.add('point');
+        div.textContent = num;
+        div.onclick = () => updateNumber(0, index);
+        row1.appendChild(div);
+      });
+      data.numbers[1].forEach((num, index) => {
+        let div = document.createElement('div');
+        div.classList.add('point');
+        div.textContent = num;
+        div.onclick = () => updateNumber(1, index);
+        row2.appendChild(div);
+      });
+    }
 
-    // Open chat in a new popup window
-    window.onload = function() {
-      if (window.opener == null) {
-        window.open(window.location.href, 'chat', 'width=600,height=400');
-        window.close();
+    async function updateNumber(row, index) {
+      const newValue = prompt("Enter new value:");
+      if (newValue !== null) {
+        let formData = new FormData();
+        formData.append('row', row);
+        formData.append('index', index);
+        formData.append('value', newValue);
+
+        await fetch('/update_number', {
+          method: 'POST',
+          body: formData
+        });
+        getNumbers();
       }
     }
+
+    setInterval(getMessages, 2000);
   </script>
 </body>
 </html>
