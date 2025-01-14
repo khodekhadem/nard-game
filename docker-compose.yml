@@ -81,6 +81,8 @@ services:
     command: tail -f
     volumes:
       - ./:/app
+    ports:
+      - 5001:5000
     networks:
       my_network:
         #ipv4_address: 192.168.1.2

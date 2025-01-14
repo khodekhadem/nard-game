@@ -54,6 +54,33 @@
       background: #eee;
       border-radius: 5px;
     }
+    #backgammonBoard {
+      width: 80%;
+      max-width: 600px;
+      height: 400px;
+      border: 2px solid #333;
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      background: #fff;
+      color: #333;
+    }
+    .point {
+      width: 30px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      border-left: 1px solid #333;
+    }
+    .point:nth-child(odd) {
+      background: #eee;
+    }
+    .point:nth-child(even) {
+      background: #ccc;
+    }
   </style>
 </head>
 <body>
@@ -61,6 +88,24 @@
   <div>
     <input id="message" type="text" placeholder="Type a message..." />
     <button id="sendBtn" onclick="sendMessage()">Send</button>
+  </div>
+  <div>
+    <button id="rollDiceBtn" onclick="rollDice()">Roll Dice</button>
+    <div id="diceResult"></div>
+  </div>
+  <div id="backgammonBoard">
+    <div class="point">1</div>
+    <div class="point">2</div>
+    <div class="point">3</div>
+    <div class="point">4</div>
+    <div class="point">5</div>
+    <div class="point">6</div>
+    <div class="point">7</div>
+    <div class="point">8</div>
+    <div class="point">9</div>
+    <div class="point">10</div>
+    <div class="point">11</div>
+    <div class="point">12</div>
   </div>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -98,6 +143,12 @@
       });
       messageBox.value = '';
       getMessages();
+    }
+
+    async function rollDice() {
+      const response = await fetch('/roll_dice');
+      const data = await response.json();
+      document.getElementById('diceResult').textContent = `Dice: ${data.dice[0]}, ${data.dice[1]}`;
     }
 
     setInterval(getMessages, 2000);
