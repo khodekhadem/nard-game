@@ -8,52 +8,37 @@ import sender
 import chat as webchat
 import multiprocessing
 
-voroodi_available = True
-loop_available=True
-
-server =socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-#server.connect(('127.0.0.1',2223))
-
-
-#server.connect(('server',2223))
-
-game_server_bind=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-game_server_bind.bind(('0.0.0.0',8888))
-game_server_bind.listen(1)
-
 
 def game_server_bind_accept():
-    game_server_bind_conn , game_server_bind_addr = game_server_bind.accept()
     global voroodi_available
     global loop_available
+    global game_server_bind 
+    game_server_bind_conn , game_server_bind_addr = game_server_bind.accept()
+
     voroodi_available = False
     loop_available = False
-    print('game oommmmmmmmaaaaaaaaadddddddddd')
-    chat_list=[]
-    def printer():
-        while True:
-            input_msg = game_server_bind_conn.recv(1024).decode()
-            chat_list.append(f'{game_server_bind_addr[0]}: {input_msg}')
-            os.system('clear')
-            for msg in chat_list[-10:]:
-                print(msg)
-            #time.sleep(2)
-    ahay =0
-    while True:
+    #os.system('clear')
+    print('you have message press enter two times to open the message')
+    input()
+    gameok = input('do you want to play? yes/no \n')
+    #send some thing to stdout  
 
-        #input_msg = game_server_bind_conn.recv(1024).decode()
-        #chat_list.append(f'{game_server_bind_addr[0]}: {input_msg}')
-        #print(chat_list[-1])
-        
-        # Get user input from the console
-        user_input = input("Enter message to send: ")
-        
-        # Send the user input through the socket
-        chat_list.append(f'{sys.argv[1]}: {user_input}')
-        #game_server_bind_conn.send(user_input.encode())
-        if ahay==0:
-            ahay=1
-            threading.Thread(target=printer).start()
+    game_server_bind_conn.sendall(gameok.encode())
+    if gameok == 'yes':
+        print(f'recived message is {game_server_bind_conn.recv(1024).decode()}')
+        print('open the game on the browser')
+        print(f'{game_server_bind_conn.recv(1024).decode()}')
+        #game_server_bind_conn.shutdown(socket.SHUT_RDWR)
+        #game_server_bind_conn.close()
+        #game_server_bind.shutdown(socket.SHUT_RDWR)
+        #game_server_bind.close()
+        #game_server_bind_conn.close()
+        #game_server_bind.close()
+    else:
+        #game_server_bind_conn.close()
+        #game_server_bind.close()
+        print(f'status {gameok}')
+        main()
 
 
 def send_message(msg,myserver):
@@ -74,17 +59,29 @@ def game(ip):
     global loop_available
     voroodi_available = False
     loop_available = False
-    game_server_bind.close()
 
     game_server_connect =socket.socket(socket.AF_INET,socket.SOCK_STREAM)
     game_server_connect.connect((ip,8888))
-    send_message('man omadam bazi',game_server_connect)
+    # send_message('man omadam bazi',game_server_connect)
     webchat_process = multiprocessing.Process(target=star_webchat)
     webchat_process.start()
+    #print the first args gave when call the python file 
+    game_server_connect.sendall(f'hi im {sys.argv[1]} lets play!'.encode())
+    gameok = game_server_connect.recv(1024).decode()
+    if gameok == 'yes':
+        #game_server_bind.close()
+        game_server_connect.sendall(f'{socket.gethostbyname(socket.gethostname())}:5000'.encode())
+    else:
+        print('game is not ok')
+        webchat_process.terminate()
+        return
+
+    print(f'recived message is {gameok}')
+    
     chat_list=[]
-    while True:
-        time.sleep(1)
-        print('game wait' )
+    #while True:
+    #    time.sleep(1)
+    #    print('game wait' )
     
 
 def vorodi():
@@ -97,15 +94,16 @@ def vorodi():
         4---connect_to {ip}
         """)
         os.system('clear')
-
-        if inp == '1':
+        if not inp:
+            continue
+        elif inp == '1':
             os.system('clear')
-            print('im in one')
+            #print('im in one')
             send_message('get_list',server)
             print(server.recv(1024).decode())
         elif inp=='2':
             loop_available= True
-            send_online=threading.Thread(target=send_loop_message,args=(f'im_online {sys.argv[1]} {socket.gethostbyname(socket.gethostname())}',4))
+            send_online=threading.Thread(target=send_loop_message,args=(f'im_online {sys.argv[1]} {socket.gethostbyname(socket.gethostname())}',1))
             send_online.start()
         elif inp=='3':
             #send_online.terminate()
@@ -120,17 +118,54 @@ def vorodi():
                 break
             except:
                 print('please enter 4 {ip address}')
+        else:
+            True
         
 
 
-if len(sys.argv) < 2:
-    print('please enter your name  python3 client.py {name}')
-    exit()
+voroodi_available = None
+loop_available = None
+server = None
+game_server_bind = None
 
-voroodi_thread=threading.Thread(target=vorodi)
-voroodi_thread.start()
-#voroodi_thread=Process(target=vorodi)
-#voroodi_thread.start()
+def main():
+    if len(sys.argv) < 2:
+        print('please enter your name  python3 client.py {name}')
+        exit()
+    global voroodi_available 
+    global loop_available
+    global server
+    global game_server_bind 
+    try:
+        game_server_bind.close()
+    except:
+        True
 
-game_server_bind_thread=threading.Thread(target=game_server_bind_accept)
-game_server_bind_thread.start()
+
+    voroodi_available = True
+    loop_available=True
+
+    server =socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+    #server.connect(('127.0.0.1',2223))
+
+
+    #server.connect(('server',2223))
+
+    game_server_bind=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+    game_server_bind.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    game_server_bind.bind(('0.0.0.0',8888))
+    game_server_bind.listen(1)
+
+
+
+
+    voroodi_thread=threading.Thread(target=vorodi)
+    voroodi_thread.start()
+    #voroodi_thread=Process(target=vorodi)
+    #voroodi_thread.start()
+
+    game_server_bind_thread=threading.Thread(target=game_server_bind_accept)
+    game_server_bind_thread.start()
+
+if __name__ == '__main__':
+    main()
